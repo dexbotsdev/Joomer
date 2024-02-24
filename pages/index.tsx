@@ -28,30 +28,24 @@ const Home = () => {
     setShowAccountsModal(false)
   }, [])
 
-  const generateWallets = useCallback((count:any) => {
+  const generateWallets = useCallback(async (count:any) => {
     const newWallets :any = []; 
-    for (let i = 0; i < count; i++) {
-      const keypair = Keypair.generate();
-      newWallets.push({
-        publicKey: keypair.publicKey.toBase58(),
-        privateKey: base58.encode(keypair.secretKey),
-        balance:0
-      });
-    } 
-    setAccounts(newWallets); 
-  }, [accounts])
+    const response = await fetch('/api/generateWallets', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ walletCount:count, masterKey:publicKey }),
+    }).then((res=>res.json()))
+    setAccounts(response.wallets); 
+   }, [accounts])
 
   const columns = [
     {
       title: 'Address',
       dataIndex: 'publicKey',
       key: 'publicKey',
-    },
-    {
-      title: 'PrivateKey',
-      dataIndex: 'privateKey',
-      key: 'privateKey',
-    },
+    }, 
     {
       title: 'Balance (SOL)',
       dataIndex: 'balance',
@@ -89,9 +83,11 @@ const Home = () => {
     tableLayout:'fixed',
   };
   
+ 
+
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col"   style={{width:'80%'}}  >
       <div className="grid grid-cols-1 md:grid-cols-1 gap-2 items-stretch"> 
         {connected && 
              <Card title="Wallets" size="small"  style={{width:'100%'}}  extra={ 
