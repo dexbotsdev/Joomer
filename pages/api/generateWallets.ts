@@ -88,7 +88,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const responseWallets =[]
          const wallets :any= await getWallets(masterWalletAddress)
 
-           for(let wallet of wallets){
+           for(const wallet of wallets){
                 const balance = await connection.getBalance(new PublicKey(wallet.publicKey));
                 const lamp = Number(balance/1e9).toFixed(4);
                 responseWallets.push({
