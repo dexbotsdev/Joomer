@@ -13,7 +13,7 @@ const wallet = Keypair.fromSecretKey(Uint8Array.from(devnetKey));
 
 
 function getWallets(masterWallet) {
-    let query =  `SELECT publicKey,  masterWalletAddress FROM wallets WHERE masterWalletAddress = '${masterWallet}'`  
+    const query =  `SELECT publicKey,  masterWalletAddress FROM wallets WHERE masterWalletAddress = '${masterWallet}'`  
 
     return new Promise(resolve => 
         dbPromise.all(query, (err, rows) =>
