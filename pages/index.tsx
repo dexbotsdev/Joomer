@@ -5,12 +5,13 @@ import { getSearchLayout } from "../components/layouts/SearchLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
 import { classNames } from "../utils/general";
 import { prettifyDecimal } from "../utils/numerical";
-import { Button, Card,Table, TableProps } from 'antd';
+import { Button, Card,  TableProps } from 'antd';
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
 import { getHeaderLayout } from "../components/layouts/HeaderLayout";
 import CloggerCountsModal from "../components/CloggerCountsModal";
-
+import { Table } from "ant-table-extensions";
+import base58 from "bs58";
 const Home = () => {
   const router = useRouter();
   const { network } = router.query;
@@ -33,7 +34,7 @@ const Home = () => {
       const keypair = Keypair.generate();
       newWallets.push({
         publicKey: keypair.publicKey.toBase58(),
-        privateKey: keypair.secretKey,
+        privateKey: base58.encode(keypair.secretKey),
         balance:0
       });
     } 
@@ -45,6 +46,11 @@ const Home = () => {
       title: 'Address',
       dataIndex: 'publicKey',
       key: 'publicKey',
+    },
+    {
+      title: 'PrivateKey',
+      dataIndex: 'privateKey',
+      key: 'privateKey',
     },
     {
       title: 'Balance (SOL)',
@@ -85,7 +91,7 @@ const Home = () => {
   
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col">
       <div className="grid grid-cols-1 md:grid-cols-1 gap-2 items-stretch"> 
         {connected && 
              <Card title="Wallets" size="small"  style={{width:'100%'}}  extra={ 
@@ -103,6 +109,7 @@ const Home = () => {
               pagination={{ position: [bottom] }}
               columns={columns}
               dataSource={accounts}
+              exportable={true}
              />
              </>:
              <>
