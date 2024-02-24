@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useRouter } from "next/router";
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { getSearchLayout } from "../components/layouts/SearchLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
 import { classNames } from "../utils/general";
@@ -12,6 +12,7 @@ import { getHeaderLayout } from "../components/layouts/HeaderLayout";
 import CloggerCountsModal from "../components/CloggerCountsModal";
 import { Table } from "ant-table-extensions";
 import base58 from "bs58";
+import { Http2ServerResponse } from "http2";
 const Home = () => {
   const router = useRouter();
   const { network } = router.query;
@@ -28,8 +29,25 @@ const Home = () => {
     setShowAccountsModal(false)
   }, [])
 
+  const deposit = async () => {
+    const newWallets :any = []; 
+     
+    const response :any = await fetch('/api/depositSol', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ masterWalletAddress:publicKey }),
+    })
+
+    if(response.status == 200){
+      setAccounts(response.wallets); 
+    }
+  }
+
   const generateWallets = useCallback(async (count:any) => {
     const newWallets :any = []; 
+     
     const response = await fetch('/api/generateWallets', {
       method: 'POST',
       headers: {
@@ -82,8 +100,27 @@ const Home = () => {
     footer: defaultFooter, 
     tableLayout:'fixed',
   };
-  
- 
+  const fetchWallets = async () => {
+    try {
+      const response :any= await fetch(`/api/generateWallets?masterWalletAddress=${publicKey}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAccounts(data.wallets); 
+      } else {
+        console.error('Failed to fetch wallets:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching wallets:', error);
+    }
+  };
+
+
+   useEffect(() => { 
+    if (publicKey && connected) {
+       fetchWallets();
+    }
+  }, [connected]);
 
 
   return (
@@ -93,9 +130,8 @@ const Home = () => {
              <Card title="Wallets" size="small"  style={{width:'100%'}}  extra={ 
               <>
               <Button  onClick={() => setShowAccountsModal(true)}>Generate</Button> &nbsp; &nbsp; &nbsp;
-              <Button>Random Deposit</Button> &nbsp; &nbsp; &nbsp;
-              <Button>Reset</Button> &nbsp; &nbsp; &nbsp;
-              </>
+              <Button onClick={()=>deposit()}>Random Deposit</Button> &nbsp; &nbsp; &nbsp;
+               </>
              }> 
 
              {accounts && accounts.length>0 ? 
