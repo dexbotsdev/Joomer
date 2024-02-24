@@ -8,8 +8,6 @@ import { prettifyDecimal } from "../utils/numerical";
 import { Button, Card,Table, TableProps } from 'antd';
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Keypair } from "@solana/web3.js";
-import { getHeaderLayout } from "../components/layouts/HeaderLayout";
-import CloggerCountsModal from "../components/CloggerCountsModal";
 
 const Home = () => {
   const router = useRouter();
@@ -27,7 +25,7 @@ const Home = () => {
     setShowAccountsModal(false)
   }, [])
 
-  const generateWallets = useCallback((count:any) => {
+  const generateWallets = useCallback((count:number) => {
     const newWallets :any = []; 
     for (let i = 0; i < count; i++) {
       const keypair = Keypair.generate();
@@ -82,11 +80,54 @@ const Home = () => {
     footer: defaultFooter, 
     tableLayout:'fixed',
   };
-  
+  const { serumMarkets, loading: serumMarketsLoading } = useSerumMarkets();
+  const StatBlock = ({
+    children,
+    loading,
+    height,
+  }: {
+    children: React.ReactNode;
+    loading: boolean;
+    height?: number;
+  }) => {
+    return !loading || network ? (
+      <div
+        className={classNames(
+          "bg-slate-800 py-2 px-3 rounded-md space-y-1 border border-slate-700"
+        )}
+      >
+        {children}
+      </div>
+    ) : (
+      <div
+        className={classNames(
+          "animate-pulse bg-slate-800 py-2 px-3 rounded-md space-y-1 border border-slate-700",
+          height ? `h-${height}` : "h-20"
+        )}
+      />
+    );
+  };
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-2 items-stretch"> 
+    <div className="flex flex-col space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+        <StatBlock loading={serumMarketsLoading}>
+          <div>
+            <p className="text-transparent bg-clip-text serum-gradient text-sm">
+              # of markets
+            </p>
+          </div>
+          {serumMarkets ? (
+            <div>
+              <p className="text-2xl font-medium text-slate-200">
+                {prettifyDecimal(serumMarkets!.length, 2)}
+              </p>
+            </div>
+          ) : null}
+          {serumMarketsLoading ? (
+            <div className="bg-slate-700 animate-pulse w-full h-8 rounded-lg" />
+          ) : null}
+        </StatBlock>
         {connected && 
              <Card title="Wallets" size="small"  style={{width:'100%'}}  extra={ 
               <>
@@ -109,17 +150,10 @@ const Home = () => {
              </>}
             </Card> }
       </div>
-      {showAccountsModal ? (
-        <CloggerCountsModal
-          onClose={handleCloseAccounts}
-          isOpen={showAccountsModal}
-          generate={generateWallets}
-        />
-      ) : null}
     </div>
   );
 };
 
-Home.getLayout = (page: ReactNode) => getHeaderLayout(page, "Home");
+Home.getLayout = (page: ReactNode) => getSearchLayout(page, "Home");
 
 export default Home;

@@ -13,6 +13,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
+    "antd": "4.24.15",
     "@headlessui/react": "^1.6.5",
     "@heroicons/react": "^2.0.12",
     "@metaplex/js": "^4.12.0",

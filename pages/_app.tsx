@@ -4,6 +4,7 @@ import { FC } from "react";
 import { ToastContainer } from "react-toastify";
 import { SerumProvider } from "../context/SerumContext";
 import { SolanaProvider } from "../context/SolanaContext";
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
 // Use require instead of import since order matters
 require("@solana/wallet-adapter-react-ui/styles.css");
