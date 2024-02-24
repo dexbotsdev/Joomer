@@ -14,7 +14,7 @@ const wallet = Keypair.fromSecretKey(Uint8Array.from(devnetKey));
 
 
 function getWallets(masterWallet) {
-    var query =  `SELECT publicKey,  masterWalletAddress FROM wallets WHERE masterWalletAddress = '${masterWallet}'`  
+    let query =  `SELECT publicKey,  masterWalletAddress FROM wallets WHERE masterWalletAddress = '${masterWallet}'`  
 
     return new Promise(resolve => 
         dbPromise.all(query, (err, rows) =>
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         }
     
-          for(var wallet of wallets){
+          for(let wallet of wallets){
                const balance = await connection.getBalance(new PublicKey(wallet.publicKey));
                const lamp = Number(balance/1e9).toFixed(4);
                responseWallets.push({
