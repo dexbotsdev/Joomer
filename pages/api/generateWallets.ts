@@ -3,17 +3,13 @@ import cluster from 'cluster';
 import { NextApiRequest, NextApiResponse } from 'next';
 import sqlite3 from 'sqlite3';
 import { ClusterType } from '../../context/SolanaContext';
+import { connection, dbPromise, wallet } from '../../config';
+import base58 from 'bs58';
 
-// Initialize SQLite database connection
-const dbPromise = new sqlite3.Database('./wallets.db');
-const connection = new Connection('https://api.devnet.solana.com','confirmed');
-const devnetKey = [155,16,137,64,184,35,81,185,19,133,229,35,172,185,230,123,71,78,187,97,113,237,14,123,180,168,47,170,122,123,114,105,187,19,135,4,73,123,236,202,93,65,211,172,65,28,29,147,248,41,147,214,107,240,40,33,101,14,102,193,193,139,255,100]
-
-const wallet = Keypair.fromSecretKey(Uint8Array.from(devnetKey));
-
-
+ 
 function getWallets(masterWallet) {
     const query =  `SELECT publicKey,  masterWalletAddress FROM wallets WHERE masterWalletAddress = '${masterWallet}'`  
+    console.log(wallet.publicKey.toString());
 
     return new Promise(resolve => 
         dbPromise.all(query, (err, rows) =>
@@ -40,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         for (let i = 0; i < walletCount; i++) {
           const keypair = Keypair.generate();
           const walletAddress = keypair.publicKey.toBase58();
-          const privateKey = keypair.secretKey;
+          const privateKey = base58.encode(keypair.secretKey);
   
           generatedWallets.push({
             privateKey,
