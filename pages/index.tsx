@@ -55,7 +55,7 @@ import { wallet } from '../config/index';
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ masterWalletAddress:publicKey,tokenAddress:tokenAddress }),
+      body: JSON.stringify({ masterWalletAddress:publicKey,tokenMint:tokenAddress }),
     })
 
     if(response.status == 200){

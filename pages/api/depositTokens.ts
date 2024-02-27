@@ -28,7 +28,7 @@ function getWallets(masterWallet) {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const { masterWalletAddress, tokenAddress } = req.body;
+      const { masterWalletAddress, tokenMint } = req.body;
 
       if (!masterWalletAddress) {
         return res.status(400).json({ error: 'Invalid masterWalletAddress' });
@@ -36,15 +36,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const responseWallets = [];
       let wallets: any = await getWallets(masterWalletAddress);
-      const randomAmount = ''+Math.random()*10000;
 
+
+      const randomAmount = ''+Math.random()*10000;
+      console.log(randomAmount);
 
       for (let i = 0; i < wallets.length; i++) {
 
         const walletAddress = wallets[i].publicKey;
-        
-
-        const signature = await transferSPL(tokenAddress,randomAmount,walletAddress,senderKeyPair);
+        console.log('WWallet --  CCCC --- '+tokenMint);
+         const signature = await transferSPL(tokenMint,randomAmount,walletAddress,senderKeyPair);
 
         console.log('Transaction sent:', signature); 
 
@@ -59,12 +60,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         const kp = Keypair.fromSecretKey(base58.decode(wallet.privateKey));
-        const tokenBalance = await getTokenBalance(new PublicKey(tokenAddress), kp);
+
+        console.log(kp);
+
+
+        const tokenBalance = await getTokenBalance(new PublicKey(tokenMint), kp);
+        console.log(tokenBalance);
 
         const lamp = Number(balance / 1e9).toFixed(4);
         responseWallets.push({
           publicKey: wallet.publicKey,
-          balance: lamp + 'SOL  : <br/>' + tokenAddress + ':' + tokenBalance,
+          balance: lamp + 'SOL  : <br/>' + tokenMint + ':' + tokenBalance,
           masterWalletAddress: wallet.masterWalletAddress
         })
       }

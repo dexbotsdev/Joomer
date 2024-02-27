@@ -34,20 +34,28 @@ export async function getTokenBalance(tokenMintAddress: PublicKey,wallet: Keypai
   try {
     const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, wallet, tokenMintAddress, wallet.publicKey);
     const tokenAccountBalance = await connection.getTokenAccountBalance(fromTokenAccount.address);
-    console.log( fromTokenAccount,tokenAccountBalance);
-    
-
-
-      return tokenAccountBalance.value.amount;
+    console.log( fromTokenAccount);
+    console.log( tokenAccountBalance); 
+    return tokenAccountBalance.value.amount;
   } catch (error) {
       console.error('Error fetching token balance:', error);
   }
-}
-
-
+} 
 export const transferSPL = async (tokenMintAddress: string, amount: string, destAddress: string, txWallet: Keypair) => {
+
+  console.log('WWallet -- 1 '+destAddress);
+
+
   const mintPubkey = new PublicKey(tokenMintAddress);
+
+  console.log('WWallet -- 2 '+mintPubkey);
+
+
   const destPubkey = new PublicKey(destAddress);
+
+  console.log('WWallet -- 3 '+destPubkey);
+
+
   const fromTokenAccount = await getOrCreateAssociatedTokenAccount(connection, txWallet, mintPubkey, txWallet.publicKey);
   const tokenAccountBalance = await connection.getTokenAccountBalance(fromTokenAccount.address);
   if (tokenAccountBalance) {
